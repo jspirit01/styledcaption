@@ -1,16 +1,19 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-  <button v-on:click="openNew"></button>
+  <div id="app">
+    <Header />
+    <div id="content" class="content">
+      <router-view/>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from './components/layout/Header.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Header,
   },
   methods: {
     openNew: function() {
