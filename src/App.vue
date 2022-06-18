@@ -1,19 +1,19 @@
 <template>
   <div id="app">
-    <Header />
-    <div id="content" class="content">
-      <router-view/>
-    </div>
+    <MyHeader id="header"/>
+    <router-view/>
+    <MyFooter/>
   </div>
 </template>
 
 <script>
-import Header from './components/layout/Header.vue'
-
+import MyHeader from './components/layout/Header.vue'
+import MyFooter from './components/layout/Footer.vue'
 export default {
   name: 'App',
   components: {
-    Header,
+    MyHeader,
+    MyFooter,
   },
   methods: {
     openNew: function() {
@@ -31,6 +31,12 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  min-height: 100%;
+  position: relative;
+  padding-bottom: 60px;
+}
+
+#header {
+  margin-bottom: 20px;
 }
 </style>

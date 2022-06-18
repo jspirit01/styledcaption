@@ -1,25 +1,31 @@
 <template>
-<ul class="nav">
-  <li class="nav-item">
-      <!-- <router-link to="/">Home</router-link>
-       <router-link to="/about">About</router-link> -->
-    <a class="nav-link active" aria-current="page" href="/">Home</a>
-  </li>
-  <li class="nav-item">
-     <a class="nav-link active" aria-current="page" href="/about">About</a>
-  
-  </li>
-  <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="/sound">Sound</a>
-  
-  </li>
-  <li class="nav-item">
-    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-  </li>
-</ul>
+	<header>
+	  <div id="nav">
+      <router-link class="menu" to="/">Home</router-link>
+      <router-link class="menu" to="/about">About</router-link>
+      <router-link class="menu" to="/sound">Sound</router-link>
+		</div>
+	</header>
 </template>
 <script>
 export default{
-    name: "header",
+    name: "myHeader",
 }
 </script>
+<style>
+h1 img {
+  height: 100%;
+}
+#nav {
+  background: #F6BD60;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+#nav .menu{
+  color: white;
+  padding: 0px;
+  margin: 10px;
+  text-decoration: none;
+}
+</style>
