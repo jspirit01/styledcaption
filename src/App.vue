@@ -3,12 +3,14 @@
     <MyHeader id="header"/>
     <router-view/>
     <MyFooter/>
+
   </div>
 </template>
 
 <script>
 import MyHeader from './components/layout/Header.vue'
 import MyFooter from './components/layout/Footer.vue'
+
 export default {
   name: 'App',
   components: {
