@@ -1,3 +1,8 @@
+import * as Pitchfinder from 'pitchfinder'
+import { Gain, Waveform } from 'tone'
+import * as Tone from 'tone'
+import { Pitch } from './Pitch'
+
 export default class AudioPlayer {
     constructor(selector = '.audioPlayer', audio = []) {
         this.playerElem = document.querySelector(selector);
@@ -9,90 +14,146 @@ export default class AudioPlayer {
         this.meydaAnalyser = null;
     }
 
+    offlineTest(){
+        
+        playSegment(this.audioElem, 1.11, 2.45); // this will play from 1.11 sec to 2.45 sec
+
+        function playSegment(audioObj, start, stop){
+            let audioObjNew = audioObj.cloneNode(true); //this is to prevent "play() request was interrupted" error. 
+            audioObjNew.currentTime = start;
+            audioObjNew.play();
+            audioObjNew.int = setInterval(function() {
+                if (audioObjNew.currentTime > stop) {
+                    audioObjNew.pause();
+                    clearInterval(audioObjNew.int);
+                }
+            }, 10);
+} 
+    }
+    toneTest(){ 
+        const synth = new Tone.Synth().toDestination();
+
+        //play a middle 'C' for the duration of an 8th note
+        synth.triggerAttackRelease("C4", "8n");
+        // const player = new Tone.Player(this.audio[0]).toDestination();
+        // Tone.loaded().then(() => {
+        //         player.start();
+        // });
+    }
+
+    loop(){
+		requestAnimationFrame(this.loop.bind(this))
+		// Object.keys(this._analyses).forEach(key => {
+		// 	this._analyses[key] = -1
+
+		// })
+        // console.log(this._analyses['pitch'])
+        
+        var result_pitch = this._pitch.getPitch();
+        console.log(result_pitch.note);
+        //this.levelRangeElement.value = result_pitch.frequency
+        this.labelElem_note.innerText  = result_pitch.note;
+
+
+        
+        
+        this.webaudioAnalyser.getByteFrequencyData(this.freqByteData);
+        this.webaudioAnalyser.getByteTimeDomainData(this.timeByteData);// array of all 1024 levels
+        var data = {f:this.freqByteData, t:this.timeByteData}
+        //console.log(this.freqByteData, this.timeByteData);                         // stream data value
+        this.labelElem_freq.innerText = this.freqByteData;
+        this.labelElem_amp.innerText = this.timeByteData;
+        
+        const canvas = this.visualiserElem;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+        var waveSum = 0;
+            for (let i = 0; i<data.f.length; i++) {
+                ctx.fillStyle="blue";
+                ctx.fillRect(i, canvas.height, 1, -data.f[i]);
+                waveSum += data.f[i]; //add current bar value (max 255)
+              }
+              for (let i = 0; i<data.t.length; i++) {
+                ctx.fillStyle="red";
+                ctx.fillRect(i*2, data.t[i], 1, 1);
+              }
+
+	}
+
+
+    //invoke the callback only if the analysis has not been run this loop
+	getAnalysis(name, cb){
+		if (this._analyses[name] === -1 || typeof this._analyses[name] === 'undefined'){
+			this._analyses[name] = cb()
+		}
+		return this._analyses[name]
+	}
+	
+	getPitch(){
+		return this.getAnalysis('pitch', () => this._pitch.getPitch())
+	}
+
+    getWaveform(){
+		return this.getAnalysis('waveform', () => this._waveform.getValue())
+	}
+
+    connect(to){
+		this._source.connect(to)
+	}
+
     createVisualiser() {
         // Analyzer 구현하기
 
-        const canvas = this.visualiserElem;
-        const ctx = canvas.getContext('2d');
-        const levelRangeElement = document.querySelector("input");
+        // feature data 확인용 element 연결
+        this.levelRangeElement = document.querySelector("input");
+        this.labelElem_freq = document.getElementById("label-freq");
+        this.labelElem_amp = document.getElementById("label-amp");
+        this.labelElem_note = document.getElementById("label-note");
+        this.labelElem_rms = document.getElementById("label-rms");
 
         this.audioContext = new AudioContext();
+        Tone.setContext(this.audioContext);
         this.src = this.audioContext.createMediaElementSource(this.audioElem);
-        const analyser = this.audioContext.createAnalyser();
+        
+        this.webaudioAnalyser = this.audioContext.createAnalyser();
+        Tone.connect(this.src, this.webaudioAnalyser);
+
+        var gainNode = this.audioContext.createGain();
+        Tone.connect(this.webaudioAnalyser, gainNode);
+
+        
+        this._pitch = new Pitch(gainNode);
+        this._waveform = this._pitch.getLastNode();
+        Tone.connect(this._waveform, this.audioContext.destination)
+        
+        // ---- 여기까지 node connection 완료
+
+        this._source = gainNode
+        this._analyses = {}
+
+        // ---- 여기부터 analyzer loop 작업 시작
+
+        this.webaudioAnalyser.fftSize = 128;
+        this.freqByteData = new Uint8Array(this.webaudioAnalyser.fftSize/2);
+        this.timeByteData = new Uint8Array(this.webaudioAnalyser.fftSize/2);
+
+        // pitch & webaudio analyzer loop
+        this.loop()
+
+        // meyda analyzer loop
         this.meydaAnalyser = Meyda.createMeydaAnalyzer({
             audioContext: this.audioContext,
             source: this.src,
             bufferSize: 512,
             featureExtractors: ["rms"],
             callback: (features) => {
-                levelRangeElement.value = features.rms;
+                this.levelRangeElement.value = features.rms;
+                this.labelElem_rms.innerText = features.rms;
                 this.feature = features.rms;
             },
             });
-        
-
-        this.src.connect(analyser);
-        analyser.connect(this.audioContext.destination);
-
-        analyser.fftSize = 128;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-
-        var freqByteData = new Uint8Array(analyser.fftSize/2);
-        var timeByteData = new Uint8Array(analyser.fftSize/2);
-
-        const barWidth = (canvas.width / bufferLength) * 2.5;
-        let barHeight;
-        let bar;
-        
-        // const audioelem = this.audioElem;
-        function renderFrame() {
-            requestAnimationFrame(renderFrame);
-            // if (audioaudioelem.paused) {
-            //     cancelAnimationFrame(id)
-            //   }
-            bar = 0;
-            
-            var k = analyser.getByteFrequencyData(dataArray);
-
-            analyser.getByteFrequencyData(freqByteData);
-            analyser.getByteTimeDomainData(timeByteData);// array of all 1024 levels
-            var data = {f:freqByteData, t:timeByteData}
-            //var data = getDataFromAudio(freqByteData, timeByteData); // {f:array, t:array}
-            console.log(freqByteData, timeByteData);                         // stream data value
-      
-            ctx.fillStyle = "#000";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-            // var waveSum = 0;
-            // for (let i = 0; i<data.f.length; i++) {
-            //     ctx.fillStyle="blue";
-            //     ctx.fillRect(i, canvas.height, 1, -data.f[i]);
-            //     waveSum += data.f[i]; //add current bar value (max 255)
-            //   }
-              
-            for (let i = 0; i < bufferLength; i++) {
-              barHeight = data.f[i] - 75;
-              const r = barHeight + (25 * (i/bufferLength));
-              ctx.fillStyle = `rgb(${r}, 100, 50)`;
-              ctx.fillRect(bar, canvas.height - barHeight, barWidth, barHeight);
-              bar += barWidth + 2;
-            }
-            for (let i = 0; i<data.t.length; i++) {
-                ctx.fillStyle="red";
-                ctx.fillRect(i*5, data.t[i], 1, 1);
-              }
-            // for (let i = 0; i < bufferLength; i++) {
-            //     barHeight = data.t[i] - 75;
-            //     const r = barHeight + (25 * (i/bufferLength));
-            //     //ctx.fillStyle = `rgb(${r}, 100, 50)`;
-            //     ctx.fillStyle = "red";
-            //     ctx.fillRect(bar*2, canvas.height - barHeight, barWidth, barHeight);
-            //     bar += barWidth + 2;
-            //   }
-        }
-
-        renderFrame();
         this.meydaAnalyser.start()
     }
 

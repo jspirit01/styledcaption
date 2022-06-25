@@ -4,16 +4,23 @@
 
     <div class="audioPlayer"></div>
 
-    <input
-    type="range"
-    id="levelRange"
-    ref="levelRange"
-    name="level"
-    min="0.0"
-    max="1.0"
-    step="0.001"
-    />
+    <p><label> frequency </label> <br><label id="label-freq">value</label></p>
+    <p><label> amplitude </label> <br><label id="label-amp">value</label></p>
+    <p><label> note </label> <br><label id="label-note">value</label></p>
+    <p><label> rms </label> <br>
+        <label id="label-rms">value</label><br>
+        <input
+                type="range"
+                id="levelRange"
+                ref="levelRange"
+                name="level"
+                min="0.0"
+                max="1.0"
+                step="0.001"
+        />
+    </p>
 
+    <button type="button" @click="tone">TONE PLAY</button>
 </template>
 <script>
 
@@ -47,6 +54,35 @@ export default {
     ]);
     },
     methods : {
+        tone() {
+                        
+            function a(number){
+                return new Promise((resolve, reject) => {
+                if (number > 4) {
+                    reject()
+                }
+                
+                setTimeout(() => {
+                    console.log('A')
+                    resolve()
+                }, 1000)
+            })
+            }
+
+
+            async function test() {
+            try {
+                await a(8) // 연산이 성공하여 resolve가 동작 -> fulfilled 
+                console.log('Resolve!')
+            } catch(error) { // 연산 실패로 에러발생 -> rejected
+                console.log('Rejected!')
+            } finally { // 연산 결과 상관없이 무조건 작동
+                console.log('Done!')
+            }
+            }
+            test();
+            this.player.offlineTest();
+        }
     
     }
 }
