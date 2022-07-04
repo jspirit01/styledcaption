@@ -2,6 +2,7 @@ import * as Pitchfinder from 'pitchfinder'
 import { Gain, Waveform } from 'tone'
 import * as Tone from 'tone'
 import { Pitch } from './Pitch'
+import Meyda from 'meyda';
 
 export default class AudioPlayer {
     constructor(selector = '.audioPlayer', audio = []) {
@@ -15,20 +16,121 @@ export default class AudioPlayer {
     }
 
     offlineTest(){
-        
-        playSegment(this.audioElem, 1.11, 2.45); // this will play from 1.11 sec to 2.45 sec
+        let audioCtx = new AudioContext();
+        let offlineCtx = new OfflineAudioContext(2,44100*40,44100);
 
-        function playSegment(audioObj, start, stop){
-            let audioObjNew = audioObj.cloneNode(true); //this is to prevent "play() request was interrupted" error. 
-            audioObjNew.currentTime = start;
-            audioObjNew.play();
-            audioObjNew.int = setInterval(function() {
-                if (audioObjNew.currentTime > stop) {
-                    audioObjNew.pause();
-                    clearInterval(audioObjNew.int);
-                }
-            }, 10);
-} 
+        const source = offlineCtx.createBufferSource();
+        //console.log(this.audio[0].url);
+        // define constants for dom nodes
+
+        // const pre = document.querySelector('pre');
+        // const myScript = document.querySelector('script');
+        const play = document.querySelector('.play');
+        // const stop = document.querySelector('.stop');
+
+        // use XHR to load an audio track, and
+        // decodeAudioData to decode it and stick it in a buffer.
+        // Then we put the buffer into the source
+
+        function getData(audioURL) {
+            const request = new XMLHttpRequest();
+
+            request.open('GET', audioURL, true);
+
+            request.responseType = 'arraybuffer';
+
+
+            request.onload = function() {
+                let audioData = request.response;
+
+                audioCtx.decodeAudioData(audioData, function(buffer) {
+                    source.buffer = buffer;
+                    var analyser = offlineCtx.createAnalyser();
+                    source.connect(analyser);
+                    analyser.connect(offlineCtx.destination);
+
+                    this.meydaAnalyser = Meyda.createMeydaAnalyzer({
+                        audioContext: offlineCtx,
+                        source: source,
+                        bufferSize: 512,
+                        featureExtractors: ["chroma"],
+                        callback: (features) => {
+                    
+                        },
+                        });
+                    this.meydaAnalyser.start()
+                    source.start();
+
+                    //source.loop = true;
+                    offlineCtx.startRendering().then(function(renderedBuffer) {
+                        console.log('Rendering completed successfully');
+                        // const channelData = renderedBuffer.getChannelData(0);
+                    
+                        // console.log("Data length "+ channelData.length.toString());
+                        // console.log(data);
+                        // // console.log("Data length "+ renderedBuffer.duration);
+                        // // for (let i = 0, length = data.length; i < length; i += 1) {
+                    
+                        // //   // careful here, as you can hang the browser by logging this data
+                        // //   // because 1 second of audio contains 22k ~ 96k samples!
+                        // //   if (!(i % 1000) && i < 25000) console.log(i + " " + data[i]);
+                        // // }  
+                        // console.log(Meyda.extract("rms", renderedBuffer));
+
+                        let song = audioCtx.createBufferSource();
+                        song.buffer = renderedBuffer;
+                        var songAnalyzer = audioCtx.createAnalyser();
+                        song.connect(songAnalyzer);
+                        songAnalyzer.connect(audioCtx.destination);
+
+                        play.onclick = function() {
+
+                         
+
+
+                            // var frequencyBins = new Uint8Array(128);
+                            
+                            // console.log(frequencyBins);
+                            // // You can also get the result of any filtering or any other stage here:
+
+                            // function renderFrame() {
+                            //     requestAnimationFrame(renderFrame);
+                            //     songAnalyzer.getByteFrequencyData(frequencyBins);
+                            //     console.log(frequencyBins);                         // stream data value
+                            // }
+
+                            // renderFrame();                       
+                            song.start();
+                        }
+                    }).catch(function(err) {
+                        console.log('Rendering failed: ' + err);
+                        // Note: The promise should reject when startRendering is called a second time on an OfflineAudioContext
+                    });
+                });
+            }
+
+            request.send();
+        }
+
+        // Run getData to start the process off
+
+        getData(this.audio[1].url);
+
+
+        // playSegment(this.audioElem, 1.11, 2.45); // this will play from 1.11 sec to 2.45 sec
+
+        // function playSegment(audioObj, start, stop){
+        //     let audioObjNew = audioObj.cloneNode(true); //this is to prevent "play() request was interrupted" error. 
+        //     audioObjNew.currentTime = start;
+        //     audioObjNew.play();
+        //     audioObjNew.int = setInterval(function() {
+        //         if (audioObjNew.currentTime > stop) {
+        //             audioObjNew.pause();
+        //             clearInterval(audioObjNew.int);
+        //         }
+        //     }, 10);
+        // } 
+
     }
     toneTest(){ 
         const synth = new Tone.Synth().toDestination();
@@ -50,9 +152,10 @@ export default class AudioPlayer {
         // console.log(this._analyses['pitch'])
         
         var result_pitch = this._pitch.getPitch();
-        console.log(result_pitch.note);
-        //this.levelRangeElement.value = result_pitch.frequency
-        this.labelElem_note.innerText  = result_pitch.note;
+        // console.log(result_pitch.note);
+        //this.levelRangeElement.value = result_pitch.frequency;        //note의 frequency??
+        //this.labelElem_freq.innerText = result_pitch.frequency; 
+        this.labelElem_note.innerText = result_pitch.note;
 
 
         
@@ -60,7 +163,8 @@ export default class AudioPlayer {
         this.webaudioAnalyser.getByteFrequencyData(this.freqByteData);
         this.webaudioAnalyser.getByteTimeDomainData(this.timeByteData);// array of all 1024 levels
         var data = {f:this.freqByteData, t:this.timeByteData}
-        //console.log(this.freqByteData, this.timeByteData);                         // stream data value
+        //console.log(this.freqByteData);                         // stream data value
+
         this.labelElem_freq.innerText = this.freqByteData;
         this.labelElem_amp.innerText = this.timeByteData;
         
@@ -135,14 +239,21 @@ export default class AudioPlayer {
 
         // ---- 여기부터 analyzer loop 작업 시작
 
+
         this.webaudioAnalyser.fftSize = 128;
-        this.freqByteData = new Uint8Array(this.webaudioAnalyser.fftSize/2);
-        this.timeByteData = new Uint8Array(this.webaudioAnalyser.fftSize/2);
+        const bufferLength = this.webaudioAnalyser.frequencyBinCount;
+        this.freqByteData = new Uint8Array(bufferLength);
+        this.timeByteData = new Uint8Array(bufferLength);
+
+        // this.webaudioAnalyser.fftSize = 128;
+        // this.freqByteData = new Uint8Array(this.webaudioAnalyser.fftSize/2);
+        // this.timeByteData = new Uint8Array(this.webaudioAnalyser.fftSize/2);
 
         // pitch & webaudio analyzer loop
         this.loop()
 
         // meyda analyzer loop
+       
         this.meydaAnalyser = Meyda.createMeydaAnalyzer({
             audioContext: this.audioContext,
             source: this.src,

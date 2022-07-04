@@ -2,6 +2,8 @@
 
     <h1>I am about</h1>
 
+
+
     <div class="audioPlayer"></div>
 
     <p><label> frequency </label> <br><label id="label-freq">value</label></p>
@@ -21,6 +23,12 @@
     </p>
 
     <button type="button" @click="tone">TONE PLAY</button>
+    
+    <!-- offline test  -->
+    <button tyoe="button" @click="offline">OFFLINE RENDERING</button>    
+    <button class="play">RENDIERING Play</button>
+    <pre></pre>
+    <!-- offline test  -->
 </template>
 <script>
 
@@ -31,13 +39,13 @@ export default {
     name: "About",
     data() {
         return{
-            music: [
-                require("../assets/audio/OvO.mp3"),
-                require("../assets/audio/Regrets.mp3"),
+            audiosample: [
+                require("../assets/audio/F_000001.wav"),
+                require("../assets/audio/M_000001.wav"),
+                require("../assets/audio/speech.mp3"),
                 require("../assets/audio/Night_Driver.mp3"),
                 require("../assets/audio/Opened_Eyes_Woke.mp3"),
-                require("../assets/audio/The_Woogie.mp3"),
-                require("../assets/audio/sample4.mp3"),
+                require("../assets/audio/The_Woogie.mp3")                
             ]
         }
     },
@@ -45,12 +53,12 @@ export default {
        //const AudioContext = window.AudioContext || window.webkitAudioContext;
        //this.audioContext = new AudioContext();
        this.player = new AudioPlayer('.audioPlayer', [
-        { name: 'OvO', url: this.music[0] },
-        { name: 'Regrets', url: this.music[1] },
-        { name: 'Night Driver', url: this.music[2] },
-        { name: 'Opened Eyes Woke', url: this.music[3] },
-        { name: 'The Woogie', url: this.music[4] },
-        { name: 'Sample4', url: this.music[5] },
+        { name: 'Speech 1', url: this.audiosample[0] },
+        { name: 'Speech 2', url: this.audiosample[1] },
+        { name: 'Speech 3', url: this.audiosample[2] },
+        { name: 'Music 1', url: this.audiosample[3] },
+        { name: 'Music 2', url: this.audiosample[4] },
+        { name: 'Music 3', url: this.audiosample[5] },
     ]);
     },
     methods : {
@@ -81,6 +89,9 @@ export default {
             }
             }
             test();
+
+        },
+        offline() {
             this.player.offlineTest();
         }
     

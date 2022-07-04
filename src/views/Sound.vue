@@ -81,11 +81,11 @@ export default {
                 audioContext: audioContext,
                 source: source,
                 bufferSize: 512,
-                featureExtractors: ["rms"],
+                featureExtractors: ["loudness"],
                 callback: (features) => {
-                    console.log(features.rms);
-                    levelRangeElement.value = features.rms;
-                    this.feature = features.rms;
+                    console.log(features.loudness);
+                    levelRangeElement.value = features.loudness;
+                    this.feature = features.loudness;
                 },
                 });
                 analyzer.start();
