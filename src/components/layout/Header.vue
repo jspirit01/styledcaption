@@ -1,5 +1,6 @@
 <template>
 	<header>
+    <div id="logo">Caption Styling System</div>
 	  <div id="nav">
       <router-link class="menu" to="/">Home</router-link>
       <router-link class="menu" to="/about">About</router-link>
@@ -13,6 +14,10 @@ export default{
 }
 </script>
 <style>
+#logo {
+  font-size: 2.5em;
+  padding: 10px;
+}
 h1 img {
   height: 100%;
 }

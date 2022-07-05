@@ -1,132 +1,96 @@
 <template>
-    <div>
-        <h1>I am home</h1>
-        <HelloWorld/>
-        <av-waveform
-            :audio-src="audio[0]">
-        </av-waveform>
-    <p>This is text</p>
-    <p class="text">누가 감히</p>
-    <button tyoe="button" @click="offlineTest">OFFLINE RENDERING</button>    
-    <button class="play">RENDIERING Play</button>
-    <canvas id="myChart" width="400" height="100"></canvas>
-
-    </div>
-        <button type=button @click="formant">FORMANT</button>
-    
-    <div id="canvas_div">
-    <canvas id="SpectrumCanvas" width="1200" height="100" ></canvas>
+    <article>
+        <!-- <audio src="" crossorigin="anonymous" ></audio> -->
+        <button class="play-btn" @click="currenttime">mark current time log</button>
+        
+        
+        <section class="container">
+            <div class="audioPlayer">
   
-</div>
+            </div>
+            
+            <div id="caption-text" >CAPTION TEXT</div>
+        </section>
+
+    
+    </article>    
+
+    <!-- <button type=button @click="formant">FORMANT</button> -->
+    
+    <!-- <canvas id="SpectrumCanvas" width="1200" height="100" ></canvas> -->
+    
+
 </template>
 <script>
 import HelloWorld from '../components/HelloWorld.vue'
 const FormantAnalyzer = require('formantanalyzer');
 import Chart from 'chart.js/auto';
 import SoundBuffer from '../Chunk.js'
+import Player from '../Player.js'
 
 export default {
     name: 'Home',
     data() {
         return{
-            timeline: { 
-                0: {'startTime': 0.0, 'endTime':1.0, 'caption':["I Had to write a lot of papers."]},
-                1: {'startTime': 1.0, 'endTime':2.0, 'caption':["write a lot of papers."]},
-                2: {'startTime': 2.0, 'endTime':2.5, 'caption':["a lot of papers."]}
-            },
-            audio: [require("../assets/audio/M_000001.wav")]
+            timeline: [
+                { 
+                    0: {'startTime': 0.0, 'endTime':2.09, 'caption':["우리 집이 잘 못 산다는 것을"]},
+                    1: {'startTime': 2.09, 'endTime':3.6, 'caption':["친구들이 알게 되었을 때"]},
+                    2: {'startTime': 5.0, 'endTime':6.87, 'caption':["무너지는 것 같았어"]}
+                },
+                { 
+                    0: {'startTime': 0.0, 'endTime':1.0, 'caption':["우리 아빠는"]},
+                    1: {'startTime': 1.6, 'endTime':2.0, 'caption':["나한테 제대로된 선물 한 번 준 적 없으셔."]},
+                    
+                },
+                { 
+                    0: {'startTime': 0.0, 'endTime':1.0, 'caption':["Which means I had to write a lot of papers."]},
+                    // 1: {'startTime': 1.0, 'endTime':2.0, 'caption':["write a lot of papers."]},
+                },
+            ],
+            audio: [
+                require("../assets/audio/F_000001.wav"),
+                require("../assets/audio/M_000001.wav"),
+                require("../assets/audio/speech.mp3"),
+                require("../assets/audio/Night_Driver.mp3"),
+                require("../assets/audio/Opened_Eyes_Woke.mp3"),
+                require("../assets/audio/The_Woogie.mp3")                
+            ]
+            // audio: {
+            //     "Speech 1": require("../assets/audio/F_000001.wav"),
+            //     "Speech 2": require("../assets/audio/M_000001.wav"),
+            //     "Speech 3": require("../assets/audio/speech.mp3"),
+            //     "Music 1": require("../assets/audio/Night_Driver.mp3"),
+            //     "Music 2": require("../assets/audio/Opened_Eyes_Woke.mp3"),
+            //     "Music 3": require("../assets/audio/The_Woogie.mp3")        
+            // }
         }
     },
     components: {
         HelloWorld,
     },
     mounted() {
+
        //const AudioContext = window.AudioContext || window.webkitAudioContext;
        //this.audioContext = new AudioContext();
        //this.soundBuffer = new SoundBuffer();
+        this.player = new Player('.audioPlayer', [
+        { name: 'Speech 1', url: this.audio[0], timeline: this.timeline[0]},
+        { name: 'Speech 2', url: this.audio[1], timeline: this.timeline[1]},
+        { name: 'Speech 3', url: this.audio[2], timeline: this.timeline[2]},
+        { name: 'Music 1', url: this.audio[3], timeline: this.timeline[0]},
+        { name: 'Music 2', url: this.audio[4], timeline: this.timeline[0]},
+        { name: 'Music 3', url: this.audio[5], timeline: this.timeline[0]},
+    ]);
     },
     methods : {
-        offlineTest() {
-            const sampleRate = 44100;
-            let audioCtx = new AudioContext();
-            let offlineCtx = new OfflineAudioContext(2,sampleRate*4,sampleRate);
-            // let offlineCtx = new OfflineAudioContext(2);
 
-            this.soundBuffer = new SoundBuffer(audioCtx, this.timeline, this.audio[0], sampleRate);
-            //console.log(this.soundBuffer);
- 
-            const source = offlineCtx.createBufferSource();
+        currenttime(){
+            
+            console.log("current time", this.player.audioElem.currentTime);
 
-            //const pre = document.querySelector('pre');
-            // const myScript = document.querySelector('script');
-            const play = document.querySelector('.play');
-            // const stop = document.querySelector('.stop');
-
-            function getData(audioURL, timeline, soundBuffer) {
-                const request = new XMLHttpRequest();
-                request.open('GET', audioURL, true);
-                request.responseType = 'arraybuffer';
-
-                request.onload = function() {
-                    let audioData = request.response;
-                    
-                    audioCtx.decodeAudioData(audioData, function(buffer) {
-                        source.buffer = buffer;
-                        source.connect(offlineCtx.destination);
-                        source.start();
-                        //source.loop = true;
-                        offlineCtx.startRendering().then(function(renderedBuffer) {
-                            console.log('Rendering completed successfully');
-                            
-                            const audioArray = renderedBuffer.getChannelData(0)
-
-                            // console.log("audioarray: ", audioArray)
-                            // console.log("sample rate: ", renderedBuffer.sampleRate)
-                            // console.log("length: ", audioArray.length)
-                            // console.log("duration: ", audioArray.length / renderedBuffer.sampleRate)
-                            
-                            for (let i = 0, length = Object.keys(timeline).length; i < length; i++){
-                                let startTime = timeline[i].startTime;
-                                let endTime = timeline[i].endTime;
-
-                                let data = audioArray.slice(startTime * sampleRate, endTime * sampleRate);
-                                console.log("hi", data, startTime * sampleRate, endTime * sampleRate)
-                                soundBuffer.log("chunk queued");
-                                let chunk = soundBuffer.createChunk(data);
-                                soundBuffer.chunks.push(chunk);
-                            }
-                            
-                            console.log(soundBuffer.chunks);
-
-
-                            //play chunk test
-                            
-                            // let song = audioCtx.createBufferSource);
-                            // song.buffer = renderedBuffer;
-                            //song.buffer = soundBuffer.chunks[0];
-
-                            // song.connect(audioCtx.destination);
-
-                            play.onclick = function() {
-                                console.log(soundBuffer.chunks[0])
-                                //soundBuffer.chunks[0].start();
-                                //soundBuffer.chunks[1].start();
-                                soundBuffer.chunks[2].start();
-                                // song.start();
-                            }
-                        }).catch(function(err) {
-                            console.log('Rendering failed: ' + err);
-                            // Note: The promise should reject when startRendering is called a second time on an OfflineAudioContext
-                        });
-                    });
-                }
-
-                request.send();
-            }
-
-            // Run getData to start the process off
-
-            getData(this.audio[0], this.timeline, this.soundBuffer);
+           
+            
         },
         formant() {
             function Configure_FormantAnalyzer()
@@ -225,7 +189,11 @@ export default {
 
 </script>
 
-<style scoped>
+<style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap');
+@import '../../node_modules/@fortawesome/fontawesome-free/css/all.css';
+
+
 p {
     display:inline-block;
     transform: scale(1,1);
@@ -244,8 +212,57 @@ p {
     font-style: normal;
 }
 
+container {
+    display: flex;
+}
+
 .text {
         font-family: 'PyeongChangPeace-Bold';
+}
+
+
+.video-container {
+    width: 900px;
+    background-color: gold;
+    display: flex;
+    align-items: center;
+}
+
+video {
+    width: 100%;
+    height: 0;
+    padding-top: 56.25%;
+    background-color: red;
+}
+
+.audioPlayer {
+    box-shadow: 0 0 32px 4px rgba(0,0,0,0.2);
+    font-family: 'Source Sans Pro', sans-serif;
+    width: fit-content;
+    display: flex;
+
+
+    .playlist {
+        background: rgba(255, 0, 0, 0);
+        display: flex;
+        flex-direction: column;
+        a {
+            i { 
+                font-size: .75rem;
+                margin-right: .5rem;
+            }
+            &:hover {
+                background-color: rgb(49, 44, 44);
+                color: rgb(255, 255, 255);
+            }
+            padding: .75rem 2.5rem;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            color: rgb(194, 33, 33);
+            text-decoration: none;
+        }
+    }
 }
 
 </style>

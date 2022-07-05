@@ -110,39 +110,39 @@ body {
      justify-content: center;
 }
 
-.audioPlayer {
-    box-shadow: 0 0 32px 4px rgba(0,0,0,0.2);
-    font-family: 'Source Sans Pro', sans-serif;
-    width: 600px;
-    display: flex;
+// .audioPlayer {
+//     box-shadow: 0 0 32px 4px rgba(0,0,0,0.2);
+//     font-family: 'Source Sans Pro', sans-serif;
 
-    canvas {
-        flex: 2;
-        width: 100%;
-        background-color: black;
-    }
+//     display: flex;
 
-    .playlist {
-        background: rgba(85, 47, 47, 0);
-        display: flex;
-        flex-direction: column;
-        a {
-            i { 
-                font-size: .75rem;
-                margin-right: .5rem;
-            }
-            &:hover {
-                background-color: rgb(49, 44, 44);
-                color: rgb(255, 255, 255);
-            }
-            padding: .75rem 2.5rem;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            color: rgb(194, 33, 33);
-            text-decoration: none;
-        }
-    }
-}
+//     canvas {
+//         flex: 2;
+//         width: 100%;
+//         background-color: rgb(212, 61, 61);
+//     }
+
+//     .playlist {
+//         background: rgba(104, 26, 26, 0);
+//         display: flex;
+//         flex-direction: column;
+//         a {
+//             i { 
+//                 font-size: .75rem;
+//                 margin-right: .5rem;
+//             }
+//             &:hover {
+//                 background-color: rgb(49, 44, 44);
+//                 color: rgb(255, 255, 255);
+//             }
+//             padding: .75rem 2.5rem;
+//             display: flex;
+//             align-items: center;
+//             width: 100%;
+//             color: rgb(194, 33, 33);
+//             text-decoration: none;
+//         }
+//     }
+// }
 
 </style>

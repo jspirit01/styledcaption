@@ -1,8 +1,6 @@
 export default class SoundBuffer {
-    constructor(ctx, timeline, audioFile,sampleRate, bufferSize = 6, debug = true) {
+    constructor(ctx, sampleRate, bufferSize = 6, debug = true) {
         this.ctx = ctx;
-        this.audioFile = audioFile;
-        this.timeline = timeline;
         this.sampleRate = sampleRate;
         this.bufferSize = bufferSize;
         this.debug = debug;
@@ -12,12 +10,12 @@ export default class SoundBuffer {
         this.lastChunkOffset = 0;
     }
     createChunk(chunk) {
-        console.log("HIHIH", this.ctx);
+        //console.log("length", chunk.length)
         var audioBuffer = this.ctx.createBuffer(2, chunk.length, this.sampleRate);
         audioBuffer.getChannelData(0).set(chunk);
         var source = this.ctx.createBufferSource();
         source.buffer = audioBuffer;
-        console.log(source.buffer);
+        //console.log(source.buffer);
         source.connect(this.ctx.destination);
         source.onended = (e) => {
             this.chunks.splice(this.chunks.indexOf(source), 1);
@@ -26,7 +24,10 @@ export default class SoundBuffer {
                 this.startTime = 0;
                 this.lastChunkOffset = 0;
             }
+            
         };
+
+        // console.log("chunks length: ", this.chunks.length)
         return source;
     }
     log(data) {
