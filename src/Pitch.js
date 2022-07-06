@@ -6,7 +6,8 @@ export class Pitch {
 	constructor(source){
 
 		this._analyser = new Waveform(1024)
-		//source.connect(this._analyser)
+		// source.connect(this._analyser)
+
         Tone.connect(source, this._analyser)
         
 

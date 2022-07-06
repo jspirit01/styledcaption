@@ -132,6 +132,7 @@ export default class AudioPlayer {
         // } 
 
     }
+
     toneTest(){ 
         const synth = new Tone.Synth().toDestination();
 
@@ -158,8 +159,6 @@ export default class AudioPlayer {
         this.labelElem_note.innerText = result_pitch.note;
 
 
-        
-        
         this.webaudioAnalyser.getByteFrequencyData(this.freqByteData);
         this.webaudioAnalyser.getByteTimeDomainData(this.timeByteData);// array of all 1024 levels
         var data = {f:this.freqByteData, t:this.timeByteData}

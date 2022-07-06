@@ -16,6 +16,7 @@ export default{
 <style>
 #logo {
   font-size: 2.5em;
+  color: white;
   padding: 10px;
 }
 h1 img {

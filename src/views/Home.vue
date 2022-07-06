@@ -18,7 +18,6 @@
     <!-- <button type=button @click="formant">FORMANT</button> -->
     
     <!-- <canvas id="SpectrumCanvas" width="1200" height="100" ></canvas> -->
-    
 
 </template>
 <script>
@@ -75,13 +74,13 @@ export default {
        //this.audioContext = new AudioContext();
        //this.soundBuffer = new SoundBuffer();
         this.player = new Player('.audioPlayer', [
-        { name: 'Speech 1', url: this.audio[0], timeline: this.timeline[0]},
-        { name: 'Speech 2', url: this.audio[1], timeline: this.timeline[1]},
-        { name: 'Speech 3', url: this.audio[2], timeline: this.timeline[2]},
-        { name: 'Music 1', url: this.audio[3], timeline: this.timeline[0]},
-        { name: 'Music 2', url: this.audio[4], timeline: this.timeline[0]},
-        { name: 'Music 3', url: this.audio[5], timeline: this.timeline[0]},
-    ]);
+            { name: 'Speech 1', url: this.audio[0], timeline: this.timeline[0]},
+            { name: 'Speech 2', url: this.audio[1], timeline: this.timeline[1]},
+            { name: 'Speech 3', url: this.audio[2], timeline: this.timeline[2]},
+            { name: 'Music 1', url: this.audio[3], timeline: this.timeline[0]},
+            { name: 'Music 2', url: this.audio[4], timeline: this.timeline[0]},
+            { name: 'Music 3', url: this.audio[5], timeline: this.timeline[0]},
+        ]);
     },
     methods : {
 
@@ -193,7 +192,9 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap');
 @import '../../node_modules/@fortawesome/fontawesome-free/css/all.css';
 
-
+#app {
+    background-color: black;
+}
 p {
     display:inline-block;
     transform: scale(1,1);
@@ -212,12 +213,18 @@ p {
     font-style: normal;
 }
 
-container {
-    display: flex;
+article {
+    display: block;
+    align-items: center;
+}
+
+.container {
+    display: block;
+    align-items: center;
 }
 
 .text {
-        font-family: 'PyeongChangPeace-Bold';
+    font-family: 'PyeongChangPeace-Bold';
 }
 
 
@@ -232,7 +239,7 @@ video {
     width: 100%;
     height: 0;
     padding-top: 56.25%;
-    background-color: red;
+    background-color: rgb(59, 87, 71);
 }
 
 .audioPlayer {
@@ -240,7 +247,6 @@ video {
     font-family: 'Source Sans Pro', sans-serif;
     width: fit-content;
     display: flex;
-
 
     .playlist {
         background: rgba(255, 0, 0, 0);
@@ -263,6 +269,11 @@ video {
             text-decoration: none;
         }
     }
+    
+    
 }
-
+#caption-text {
+    font-size: 20px;
+    color: white;
+}
 </style>

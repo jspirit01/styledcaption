@@ -18,6 +18,7 @@ export default class Player {
         this.currentChunk = null;
         this.currentChunkId = 0;
     }
+
     initialize(){
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         this.audioContext = new AudioContext();        
@@ -29,7 +30,7 @@ export default class Player {
         const CAPTION_TOTAL_NUM = Object.keys(this.currentAudio.timeline).length;
         const LEGNTH = Math.ceil(this.currentAudio.timeline[CAPTION_TOTAL_NUM-1].endTime);
         let audioCtx = new AudioContext();
-        let offlineCtx = new OfflineAudioContext(2,SAMPLERATE*LEGNTH,SAMPLERATE);
+        let offlineCtx = new OfflineAudioContext(2, SAMPLERATE*LEGNTH, SAMPLERATE);
         // let offlineCtx = new OfflineAudioContext(2);
 
         this.soundBuffer = new SoundBuffer(audioCtx, SAMPLERATE);
@@ -51,43 +52,28 @@ export default class Player {
                 let audioData = request.response;
                 
                 audioCtx.decodeAudioData(audioData, function(buffer) {
+                    console.log("decodeBuffer", buffer);
                     source.buffer = buffer;
                     source.connect(offlineCtx.destination);
                     source.start();
                     //source.loop = true;
                     offlineCtx.startRendering().then(function(renderedBuffer) {
                         console.log('Rendering completed successfully');
-                
+                        
                         const audioArray = renderedBuffer.getChannelData(0)
+
+                        console.log("renderedBuffer", renderedBuffer);
+                        //console.log("audioArray", audioArray);
+                        
                         for (let i = 0, length = CAPTION_TOTAL_NUM; i < length; i++){
                             let startTime = timeline[i].startTime;
                             let endTime = timeline[i].endTime;
                             
                             let data = audioArray.slice(startTime * SAMPLERATE, endTime * SAMPLERATE);
-                            //console.log("hi-", i, data.length, startTime * SAMPLERATE, endTime * SAMPLERATE)
-                            //console.log(startTime * SAMPLERATE - endTime * SAMPLERATE)
-                            //soundBuffer.log("chunk queued");
+                            
                             let chunk = soundBuffer.createChunk(data);
                             soundBuffer.chunks.push(chunk);
                         }
-                        
-
-                        //play chunk test
-                        
-                        // let song = audioCtx.createBufferSource);
-                        // song.buffer = renderedBuffer;
-                        //song.buffer = soundBuffer.chunks[0];
-
-                        // song.connect(audioCtx.destination);
-
-                        // play.onclick = function() {
-                        //     //console.log(soundBuffer.chunks[0])
-                        //     //soundBuffer.chunks[0].start();
-                        //     //soundBuffer.chunks[1].start();
-
-                        //     soundBuffer.chunks[0].start();
-
-                        // }
                     }).catch(function(err) {
                         console.log('Rendering failed: ' + err);
                         // Note: The promise should reject when startRendering is called a second time on an OfflineAudioContext
@@ -108,18 +94,6 @@ export default class Player {
     }
 
     createPlayerElements() {
-        // this.inputElem = document.createElement('input');
-        // this.audioElem = document.createElement('audio');
-        // const playListElem = document.createElement('div');
-        // playListElem.classList.add('playlist');
-        // const playElem = document.createElement('button');
-        // playElem.classList.add('play');
-        // playElem.innerHTML = '<i class="fa fa-play"></i>';
-        // this.visualiserElem = document.createElement('canvas');
-        // this.playerElem.appendChild(this.audioElem);
-        // this.playerElem.appendChild(playListElem);
-        // this.playerElem.appendChild(this.visualiserElem);
-
         this.audioElem = document.createElement('audio');
         const playListElem = document.createElement('div');
         const videoContainerElem = document.createElement('div');
@@ -202,7 +176,7 @@ export default class Player {
                     //     this.cid = 0;
                     //     this.lastChunk = true;
                     // }
-                    console.log(this.cid, this.soundBuffer.chunks.length);
+                    //console.log(this.cid, this.soundBuffer.chunks.length);
                     if (this.cid < this.soundBuffer.chunks.length){
                         
                         let captionItem = this.currentAudio.timeline[this.cid];
@@ -211,7 +185,7 @@ export default class Player {
                             this.captionElem.innerText = captionItem.caption;
 
                             // and then, move next chunk
-                            console.log(this.cid, this.soundBuffer.chunks.length)
+                            //console.log(this.cid, this.soundBuffer.chunks.length)
                             this.cid += 1
                             this.currentChunk = this.soundBuffer.chunks[this.cid];
                         }

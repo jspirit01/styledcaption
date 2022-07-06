@@ -3,6 +3,7 @@
     <div class="footer">Soft Computing & Interaction Lab. @ GIST</div>
   </footer>
 </template>
+
 <script>
 export default {
   name: "myFooter"
