@@ -30,8 +30,8 @@
     ref="levelRange"
     name="level"
     min="0.0"
-    max="1.0"
-    step="0.001"
+    max="0.5"
+    step="0.01"
     />
     <p>value {{feature}}</p>
 
@@ -57,7 +57,7 @@ export default {
             feature1: 111,
             feature2: 111,
             feature3: 111,
-            voice: require("../assets/audio/sample4.mp3"),
+            voice: require("../assets/audio/F_000001.wav"),
             music: require("../assets/audio/classic.mp3"),
             sfx: require("../assets/audio/classic.mp3")
         }
@@ -72,24 +72,35 @@ export default {
             source.connect(audioContext.destination);
 
             const levelRangeElement = this.$refs.levelRange;
-
+            const featureArray = [];
             console.log("analyze start");
             if (typeof Meyda === "undefined") {
                 console.log("Meyda could not be found! Have you included it?");
             } else {
+                
+
                 const analyzer = Meyda.createMeydaAnalyzer({
                 audioContext: audioContext,
                 source: source,
                 bufferSize: 512,
-                featureExtractors: ["loudness"],
+                featureExtractors: ["rms"],
                 callback: (features) => {
-                    console.log(features.loudness);
-                    levelRangeElement.value = features.loudness;
-                    this.feature = features.loudness;
+                    console.log("rms", features.rms);
+                    levelRangeElement.value = features.rms;
+
+                    this.feature = features.rms;
+                    featureArray.push(features.rms);
+                    
+                    const result = featureArray.reduce(function add(sum, currValue) {
+                        return sum + currValue;
+                    }, 0);
+                    const average = result / featureArray.length;
+                    console.log("AVERAGE: ", average)
                 },
                 });
                 analyzer.start();
             }
+            
         },
         playMusic(){
             const audioContext = new AudioContext();
@@ -228,7 +239,7 @@ export default {
             var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             var analyser = audioCtx.createAnalyser();
 
-            const htmlAudioElement = new Audio(this.sfx);
+            const htmlAudioElement = new Audio(this.voice);
             htmlAudioElement.play();
             const source = audioCtx.createMediaElementSource(htmlAudioElement);
             const distortion = audioCtx.createWaveShaper();

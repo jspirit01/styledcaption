@@ -157,12 +157,13 @@ export default class AudioPlayer {
         //this.levelRangeElement.value = result_pitch.frequency;        //note의 frequency??
         //this.labelElem_freq.innerText = result_pitch.frequency; 
         this.labelElem_note.innerText = result_pitch.note;
+        console.log("note", result_pitch.frequency);
 
 
         this.webaudioAnalyser.getByteFrequencyData(this.freqByteData);
         this.webaudioAnalyser.getByteTimeDomainData(this.timeByteData);// array of all 1024 levels
         var data = {f:this.freqByteData, t:this.timeByteData}
-        //console.log(this.freqByteData);                         // stream data value
+        console.log(this.freqByteData);                         // stream data value
 
         this.labelElem_freq.innerText = this.freqByteData;
         this.labelElem_amp.innerText = this.timeByteData;

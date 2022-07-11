@@ -11,7 +11,15 @@
             
             <div id="caption-text" >CAPTION TEXT</div>
         </section>
-
+<input
+    type="range"
+    id="levelRange"
+    ref="levelRange"
+    name="level"
+    min="0.0"
+    max="0.05"
+    step="0.001"
+    />
     
     </article>    
 
@@ -26,6 +34,7 @@ const FormantAnalyzer = require('formantanalyzer');
 import Chart from 'chart.js/auto';
 import SoundBuffer from '../Chunk.js'
 import Player from '../Player.js'
+import captionJson from '../assets/caption/caption_styling.json'
 
 export default {
     name: 'Home',
@@ -43,7 +52,7 @@ export default {
                     
                 },
                 { 
-                    0: {'startTime': 0.0, 'endTime':1.0, 'caption':["Which means I had to write a lot of papers."]},
+                    0: {'startTime': 0.0, 'endTime':6.0, 'caption':["Which means I had to write a lot of papers."]},
                     // 1: {'startTime': 1.0, 'endTime':2.0, 'caption':["write a lot of papers."]},
                 },
             ],
@@ -54,7 +63,11 @@ export default {
                 require("../assets/audio/Night_Driver.mp3"),
                 require("../assets/audio/Opened_Eyes_Woke.mp3"),
                 require("../assets/audio/The_Woogie.mp3")                
+            ],
+            captions: [
+                captionJson
             ]
+            ,
             // audio: {
             //     "Speech 1": require("../assets/audio/F_000001.wav"),
             //     "Speech 2": require("../assets/audio/M_000001.wav"),
@@ -69,17 +82,21 @@ export default {
         HelloWorld,
     },
     mounted() {
+        // fetch("../assets/caption/caption_styling.json").then(response => {
+        //     return response.json();
+        // }).then(jsondata => console.log(jsondata))
 
+        console.log(this.captions)
        //const AudioContext = window.AudioContext || window.webkitAudioContext;
        //this.audioContext = new AudioContext();
        //this.soundBuffer = new SoundBuffer();
         this.player = new Player('.audioPlayer', [
-            { name: 'Speech 1', url: this.audio[0], timeline: this.timeline[0]},
-            { name: 'Speech 2', url: this.audio[1], timeline: this.timeline[1]},
-            { name: 'Speech 3', url: this.audio[2], timeline: this.timeline[2]},
-            { name: 'Music 1', url: this.audio[3], timeline: this.timeline[0]},
-            { name: 'Music 2', url: this.audio[4], timeline: this.timeline[0]},
-            { name: 'Music 3', url: this.audio[5], timeline: this.timeline[0]},
+            { name: 'Speech 1', url: this.audio[0], timeline: this.captions[0]},
+            // { name: 'Speech 2', url: this.audio[1], timeline: this.timeline[1]},
+            // { name: 'Speech 3', url: this.audio[2], timeline: this.timeline[2]},
+            // { name: 'Music 1', url: this.audio[3], timeline: this.timeline[0]},
+            // { name: 'Music 2', url: this.audio[4], timeline: this.timeline[0]},
+            // { name: 'Music 3', url: this.audio[5], timeline: this.timeline[0]},
         ]);
     },
     methods : {

@@ -1,0 +1,29 @@
+{
+    "0": {
+        "startTime": 0.0,
+        "endTime": 2.09,
+        "text": "우리 집이 잘 못 산다는 것을",
+        "rms": 0.0645415261387825,
+        "pitch": 264.6707458496094,
+        "motion": "emotion_label",
+        "font": "emotion_label"
+    },
+    "1": {
+        "startTime": 2.09,
+        "endTime": 3.6,
+        "text": "친구들이 알게 되었을 때",
+        "rms": 0.05951531603932381,
+        "pitch": 311.373046875,
+        "motion": "emotion_label",
+        "font": "emotion_label"
+    },
+    "2": {
+        "startTime": 5.0,
+        "endTime": 6.87,
+        "text": "무너지는 것 같았어",
+        "rms": 0.05489075556397438,
+        "pitch": 252.00042724609375,
+        "motion": "emotion_label",
+        "font": "emotion_label"
+    }
+}

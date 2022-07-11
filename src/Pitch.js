@@ -6,6 +6,7 @@ export class Pitch {
 	constructor(source){
 
 		this._analyser = new Waveform(1024)
+		// this._analyser = new Waveform(1024, {context: source})
 		// source.connect(this._analyser)
 
         Tone.connect(source, this._analyser)
@@ -24,8 +25,9 @@ export class Pitch {
 
 	getPitch(){
 		const values = this._analyser.getValue()
+		//console.log(values);
 		let { freq, probability } = this._pichfinder(values)
-        console.log(freq)
+        // console.log("frequency", freq)
 		//some smoothing
 		if (freq < 30){
 			probability = 0

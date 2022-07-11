@@ -73,7 +73,9 @@ export default class Player {
                             
                             let chunk = soundBuffer.createChunk(data);
                             soundBuffer.chunks.push(chunk);
+                            console.log("push chunk ---------------------------------")
                         }
+                        
                     }).catch(function(err) {
                         console.log('Rendering failed: ' + err);
                         // Note: The promise should reject when startRendering is called a second time on an OfflineAudioContext
@@ -87,6 +89,7 @@ export default class Player {
         // Run getData to start the process off
         getData(this.currentAudio.url, this.currentAudio.timeline, this.soundBuffer);
 
+        
         this.currentChunk = this.soundBuffer.chunks[0];
         this.cid = 0;
         this.notCompleted = false;
@@ -182,7 +185,7 @@ export default class Player {
                         let captionItem = this.currentAudio.timeline[this.cid];
                         if (!this.notCompleted && this.audioElem.currentTime >= captionItem.startTime ) {
                             // change caption
-                            this.captionElem.innerText = captionItem.caption;
+                            this.captionElem.innerText = captionItem.text;
 
                             // and then, move next chunk
                             //console.log(this.cid, this.soundBuffer.chunks.length)
